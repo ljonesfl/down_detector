@@ -13,7 +13,7 @@ class DownDetector:
     SCHEDULE_START = dttime(6, 30)
     SCHEDULE_END = dttime(22, 0)
 
-    ACTIVE_TIMEOUT = 15
+    ACTIVE_TIMEOUT = 10
     DOWN_TIMEOUT = 5
     RESPONSE_TIMEOUT = 5
 
@@ -26,10 +26,12 @@ class DownDetector:
     def __init__(self):
         self.current_state = None
         self.timeout = self.DOWN_TIMEOUT
+
         self.outages_total = 0
-        self.outages_total_time = 0
-        self.active_total_time = 0
         self.outage_current_time = 0
+        self.outages_total_time = 0
+
+        self.active_total_time = 0
         self.active_current_time = 0
 
         if not os.path.exists(self.ACTIVE_FILE):

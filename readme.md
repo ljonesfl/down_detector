@@ -20,6 +20,8 @@ The pyttsx3 package proved to be unstable so I opted for gTTS. gTTS requires an 
 to generate the files so, the first time the program is ran, it will require an active connection
 to generate the mp3 files. After that, it can speak its phrases whether connected or not.
 
+State changes will only be announced during a scheduled window. The default schedule is 630am to 10pm.
+
 ### Phrases
 The phrases are configurable via ACTIVE_TEXT and DOWN_TEXT. To change the phrase, simply update
 the text, delete the mp3 files in the audio folder then re-run the program.
