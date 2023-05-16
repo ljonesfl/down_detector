@@ -1,11 +1,12 @@
 from gtts import gTTS
 import os
-import requests
 import time
+import socket
+import platform
 from datetime import datetime, time as dttime
 
 
-URL = "https://www.google.com"
+URL = "www.google.com"
 
 
 class DownDetector:
@@ -23,7 +24,7 @@ class DownDetector:
     DOWN_FILE = "audio/down.mp3"
 
     def __init__(self):
-        self.current_state = False
+        self.current_state = None
         self.timeout = self.DOWN_TIMEOUT
         self.outages_total = 0
         self.outages_total_time = 0
@@ -47,14 +48,20 @@ class DownDetector:
 
     def play(self, file):
         if self.is_in_schedule():
-            os.system(f"afplay {file}")
+            if platform.system() == "Windows":
+                os.system(f"start {file}")
+            elif platform.system() == "Darwin":
+                os.system(f"afplay {file}")
+            else:
+                os.system(f"mpg123 {file}")
 
     @staticmethod
-    def check_internet(url):
+    def is_connected(url):
         try:
-            response = requests.get(url, timeout=(DownDetector.RESPONSE_TIMEOUT, DownDetector.RESPONSE_TIMEOUT))
+            socket.gethostbyname(url)
             return True
-        except requests.RequestException:
+        except socket.error as error:
+            print(error)
             return False
 
     def down(self):
@@ -87,11 +94,8 @@ class DownDetector:
             outage_average = self.outages_total_time / self.outages_total
             print(f"Total outages: {self.outages_total}, Average downtime: {outage_average}")
 
-
     def detect(self, url):
-        print("Checking connection..")
-
-        state = self.check_internet(url)
+        state = self.is_connected(url)
 
         if state != self.current_state:
             if state:
@@ -101,7 +105,6 @@ class DownDetector:
 
             self.current_state = state
 
-        print("Sleeping..")
         time.sleep(self.timeout)
 
 
