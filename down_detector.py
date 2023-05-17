@@ -69,6 +69,7 @@ class DownDetector:
 
     @staticmethod
     def create_mp3(text, file):
+        print( f"Creating {file}")
         tts = gTTS(text)
         tts.save(file)
 
