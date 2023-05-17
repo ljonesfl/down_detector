@@ -1,0 +1,17 @@
+schedule:
+  start_hour: 8
+  end_hour: 22
+
+timeout:
+  active: 10
+  down: 5
+  response: 5
+
+phrase:
+  active: the internet connection has been restored
+  down: the internet is currently unreachable
+
+audio:
+  active: audio/active.mp3
+  down: audio/down.mp3
+

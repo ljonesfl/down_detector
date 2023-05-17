@@ -28,6 +28,6 @@ the text, delete the mp3 files in the audio folder then re-run the program.
 
 ## Installation
     source venv/bin/activate
-    pip install requests
     pip install gTTS
+    pip install pyyaml
 

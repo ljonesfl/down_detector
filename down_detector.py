@@ -1,9 +1,11 @@
 from gtts import gTTS
 import os
 import time
+import socket
 import platform
+import yaml
 from datetime import datetime, time as dttime
-from ping3 import ping
+
 
 URL = "www.google.com"
 
@@ -16,7 +18,7 @@ class DownDetector:
     DOWN_TIMEOUT = 5
     RESPONSE_TIMEOUT = 5
 
-    ACTIVE_TEXT = "the internet connection is restored"
+    ACTIVE_TEXT = "the internet connection has been restored"
     DOWN_TEXT = "the internet is currently unreachable"
 
     ACTIVE_FILE = "audio/active.mp3"
@@ -33,13 +35,34 @@ class DownDetector:
         self.active_total_time = 0
         self.active_current_time = 0
 
-        self.latency = 0
-
+        self.load_config()
         if not os.path.exists(self.ACTIVE_FILE):
             self.create_mp3(self.ACTIVE_TEXT, self.ACTIVE_FILE)
 
         if not os.path.exists(self.DOWN_FILE):
             self.create_mp3(self.DOWN_TEXT, self.DOWN_FILE)
+
+    def load_config(self):
+        try:
+            with open("down_detector.yaml", "r") as f:
+                config = yaml.safe_load(f)
+
+            self.SCHEDULE_START = dttime(config["schedule"]["start_hour"], 0)
+            self.SCHEDULE_END = dttime(config["schedule"]["end_hour"], 0)
+
+            self.ACTIVE_TIMEOUT = config["timeout"]["active"]
+            self.DOWN_TIMEOUT = config["timeout"]["down"]
+            self.RESPONSE_TIMEOUT = config["timeout"]["response"]
+
+            self.ACTIVE_TEXT = config["phrase"]["active"]
+            self.DOWN_TEXT = config["phrase"]["down"]
+
+            self.ACTIVE_FILE = config["audio"]["active"]
+            self.DOWN_FILE = config["audio"]["down"]
+
+        except Exception as e:
+            print(e)
+            print("Failed to load config, using defaults")
 
     def is_in_schedule(self):
         return self.SCHEDULE_START <= datetime.now().time() <= self.SCHEDULE_END
@@ -58,11 +81,13 @@ class DownDetector:
             else:
                 os.system(f"mpg123 {file}")
 
-    def is_connected(self, url):
-        self.latency = ping(url)
-        if self.latency is not None:
+    @staticmethod
+    def is_connected(url):
+        try:
+            socket.gethostbyname(url)
             return True
-        else:
+        except socket.error as error:
+            print(error)
             return False
 
     def down(self):
@@ -79,7 +104,7 @@ class DownDetector:
             self.active_total_time += current_active_seconds
             print(f"Up for {current_active_seconds}s")
             active_average = self.active_total_time / self.outages_total
-            print(f"Total uptime: {self.active_total_time}s, Average uptime: {active_average}")
+            print(f"Total uptime: {self.active_total_time}s, Average uptime: {active_average}s")
 
     def active(self):
         print("Internet is active")
@@ -93,7 +118,7 @@ class DownDetector:
             self.outages_total_time += current_outage_seconds
             print(f"Down for {current_outage_seconds}s")
             outage_average = self.outages_total_time / self.outages_total
-            print(f"Total outages: {self.outages_total}, Average downtime: {outage_average}")
+            print(f"Total outages: {self.outages_total}, Average downtime: {outage_average}s")
 
     def detect(self, url):
         state = self.is_connected(url)
@@ -113,5 +138,5 @@ if __name__ == '__main__':
     dd = DownDetector()
 
     while True:
-        print('.', end="", flush=True)
+        print('.', end='', flush=True)
         dd.detect(URL)
