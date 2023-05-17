@@ -1,10 +1,9 @@
 from gtts import gTTS
 import os
 import time
-import socket
 import platform
 from datetime import datetime, time as dttime
-
+from ping3 import ping
 
 URL = "www.google.com"
 
@@ -17,7 +16,7 @@ class DownDetector:
     DOWN_TIMEOUT = 5
     RESPONSE_TIMEOUT = 5
 
-    ACTIVE_TEXT = "the internet connection is active"
+    ACTIVE_TEXT = "the internet connection is restored"
     DOWN_TEXT = "the internet is currently unreachable"
 
     ACTIVE_FILE = "audio/active.mp3"
@@ -33,6 +32,8 @@ class DownDetector:
 
         self.active_total_time = 0
         self.active_current_time = 0
+
+        self.latency = 0
 
         if not os.path.exists(self.ACTIVE_FILE):
             self.create_mp3(self.ACTIVE_TEXT, self.ACTIVE_FILE)
@@ -57,13 +58,11 @@ class DownDetector:
             else:
                 os.system(f"mpg123 {file}")
 
-    @staticmethod
-    def is_connected(url):
-        try:
-            socket.gethostbyname(url)
+    def is_connected(self, url):
+        self.latency = ping(url)
+        if self.latency is not None:
             return True
-        except socket.error as error:
-            print(error)
+        else:
             return False
 
     def down(self):
@@ -114,4 +113,5 @@ if __name__ == '__main__':
     dd = DownDetector()
 
     while True:
+        print('.', end="", flush=True)
         dd.detect(URL)
