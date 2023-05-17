@@ -29,7 +29,7 @@ class DownDetector:
     SLOW_FILE = "audio/slow.mp3"
     NORMAL_FILE = "audio/normal.mp3"
 
-    LATENCY_MIN = 0.150
+    LATENCY_MIN = 0.200
 
     def __init__(self):
         self.current_connection_state = None

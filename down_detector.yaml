@@ -20,4 +20,4 @@ audio:
   normal: audio/normal.mp3
 
 latency:
-  min: 0.150
+  min: 0.200
