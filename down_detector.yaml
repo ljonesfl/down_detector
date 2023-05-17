@@ -8,10 +8,16 @@ timeout:
   response: 5
 
 phrase:
-  active: the internet connection has been restored
+  active: the internet connection is active
   down: the internet is currently unreachable
+  slow: the internet is currently slow
+  normal: the internet speed is normal
 
 audio:
   active: audio/active.mp3
   down: audio/down.mp3
+  slow: audio/slow.mp3
+  normal: audio/normal.mp3
 
+latency:
+  min: 0.150
