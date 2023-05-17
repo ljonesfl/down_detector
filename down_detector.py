@@ -21,7 +21,7 @@ class DownDetector:
 
     ACTIVE_TEXT = "the internet connection has been restored"
     DOWN_TEXT = "the internet is currently unreachable"
-    LATENCY_HIGH_TEXT = "the internet is currently slow"
+    LATENCY_HIGH_TEXT = "the internet speed is currently slow"
     LATENCY_NORMAL_TEXT = "the internet speed is back to normal"
 
     ACTIVE_FILE = "audio/active.mp3"
@@ -117,10 +117,10 @@ class DownDetector:
         latency = ping3.ping(url, timeout=self.RESPONSE_TIMEOUT)
         if latency:
             if latency > self.LATENCY_MIN:
-                print(f"Latency {latency}ms is too high")
+                print(f"Latency {latency*1000}ms is too high")
                 return True
             else:
-                print(f"Latency is {latency}ms")
+                print(f"Latency: {latency*1000}ms")
                 return False
         else:
             print(f"Latency is None")
@@ -194,5 +194,4 @@ if __name__ == '__main__':
     dd = DownDetector()
 
     while True:
-        print('.', end='', flush=True)
         dd.detect(URL)

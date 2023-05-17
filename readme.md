@@ -25,8 +25,8 @@ then say something if it changes state to down and back up.
 
     python3 down_detector.py
     
-It is currently configured to poll the internet every 15 seconds while active and every 5 seconds
-while down.
+The program will periodically check the internet connection and announce when it is unavailable. It will
+also announce if the latency exceeds a specified threshold.
 
 The pyttsx3 package proved to be unstable so I opted for gTTS. gTTS requires an internet connection
 to generate the files so, the first time the program is ran, it will require an active connection
