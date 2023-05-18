@@ -40,8 +40,8 @@ the text, delete the mp3 files in the audio folder then re-run the program.
 
 ### Configuration
 
-The configuration is stored in a down_detector.yaml file.
-Be sure to restart the program after making changes to the config file.
+The configuration is stored in down_detector.yaml.
+The program will automatically detect changes to the config file and reload it without having to restart.
 
 ## Installation
     source venv/bin/activate

@@ -12,6 +12,7 @@ URL = "www.google.com"
 
 
 class DownDetector:
+    CONFIG_FILE = "down_detector.yaml"
     SCHEDULE_START = dttime(6, 30)
     SCHEDULE_END = dttime(22, 0)
 
@@ -30,11 +31,13 @@ class DownDetector:
     NORMAL_FILE = "audio/normal.mp3"
 
     LATENCY_MIN = 0.200
+    LATENCY_COUNT = 3
 
     def __init__(self):
         self.current_connection_state = None
         self.timeout = self.DOWN_TIMEOUT
 
+        self.current_latency_count = 0
         self.current_latency_state = None
 
         self.outages_total = 0
@@ -44,6 +47,7 @@ class DownDetector:
         self.active_total_time = 0
         self.active_current_time = 0
 
+        self.config_modified = 0
         self.load_config()
 
         self.create_audio_files()
@@ -61,9 +65,17 @@ class DownDetector:
         if not os.path.exists(self.NORMAL_FILE):
             self.create_mp3(self.LATENCY_NORMAL_TEXT, self.NORMAL_FILE)
 
+    def check_config(self):
+        last_modified = os.path.getmtime(self.CONFIG_FILE)
+        time_difference = last_modified - self.config_modified
+        if time_difference != 0:
+            print("Config file changed, reloading...")
+            self.load_config()
+
     def load_config(self):
+        self.config_modified = os.path.getmtime(self.CONFIG_FILE)
         try:
-            with open("down_detector.yaml", "r") as f:
+            with open(self.CONFIG_FILE, "r") as f:
                 config = yaml.safe_load(f)
 
             self.SCHEDULE_START = dttime(config["schedule"]["start_hour"], 0)
@@ -81,7 +93,8 @@ class DownDetector:
             self.ACTIVE_FILE = config["audio"]["active"]
             self.DOWN_FILE = config["audio"]["down"]
             self.LATENCY_MIN = config["latency"]["min"]
-
+            self.LATENCY_COUNT = config["latency"]["count"]
+            print("Loaded config file.")
         except Exception as e:
             print(e)
             print("Failed to load config, using defaults")
@@ -115,15 +128,23 @@ class DownDetector:
 
     def is_latency_high(self, url):
         latency = ping3.ping(url, timeout=self.RESPONSE_TIMEOUT)
-        if latency:
-            if latency > self.LATENCY_MIN:
-                print(f"Latency {latency*1000}ms is too high")
+        if not latency or latency > self.LATENCY_MIN:
+            self.current_latency_count += 1
+
+            if not latency:
+                latency = "timeout"
+            else:
+                latency = print(f"{latency*1000}ms")
+
+            if self.current_latency_count >= self.LATENCY_COUNT:
+                print(f"Latency {latency} is too high")
                 return True
             else:
-                print(f"Latency: {latency*1000}ms")
+                print(f"*** Latency: {latency}")
                 return False
         else:
-            print(f"Latency is None")
+            print(f"Latency: {latency*1000}ms")
+            self.current_latency_count = 0
             return False
 
     def down(self):
@@ -188,6 +209,7 @@ class DownDetector:
             self.current_latency_state = state
 
         time.sleep(self.timeout)
+        self.check_config()
 
 
 if __name__ == '__main__':

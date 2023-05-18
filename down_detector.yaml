@@ -1,5 +1,5 @@
 schedule:
-  start_hour: 8
+  start_hour: 7
   end_hour: 22
 
 timeout:
@@ -20,4 +20,6 @@ audio:
   normal: audio/normal.mp3
 
 latency:
-  min: 0.200
+  min: 0.150
+  count: 3
+
