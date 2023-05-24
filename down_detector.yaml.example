@@ -22,4 +22,17 @@ audio:
 latency:
   min: 0.150
   count: 3
+  beep_on_slow: false
 
+leds:
+  active_pin: 17
+  latency_pin: 27
+
+notify:
+  active:
+    voice: true
+    led: false
+  latency:
+    voice: true
+    led: false
+    beep: true

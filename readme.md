@@ -44,8 +44,9 @@ The configuration is stored in down_detector.yaml.
 The program will automatically detect changes to the config file and reload it without having to restart.
 
 ## Installation
-    source venv/bin/activate
     pip install gTTS
     pip install pyyaml
     pip install ping3
-
+    pip install simpleaudio
+    pip install numpy
+    pip install RPi.GPIO

@@ -1,215 +1,49 @@
-from gtts import gTTS
-import os
 import time
-import socket
-import platform
-import yaml
-import ping3
-from datetime import datetime, time as dttime
-
+from config import Config
+from network import Network
+from notify import Notify
 
 URL = "www.google.com"
 
 
 class DownDetector:
-    CONFIG_FILE = "down_detector.yaml"
-    SCHEDULE_START = dttime(6, 30)
-    SCHEDULE_END = dttime(22, 0)
-
-    ACTIVE_TIMEOUT = 10
-    DOWN_TIMEOUT = 5
-    RESPONSE_TIMEOUT = 5
-
-    ACTIVE_TEXT = "the internet connection has been restored"
-    DOWN_TEXT = "the internet is currently unreachable"
-    LATENCY_HIGH_TEXT = "the internet speed is currently slow"
-    LATENCY_NORMAL_TEXT = "the internet speed is back to normal"
-
-    ACTIVE_FILE = "audio/active.mp3"
-    DOWN_FILE = "audio/down.mp3"
-    SLOW_FILE = "audio/slow.mp3"
-    NORMAL_FILE = "audio/normal.mp3"
-
-    LATENCY_MIN = 0.200
-    LATENCY_COUNT = 3
+    CONFIG_FILE = "down_detector.yaml.example"
 
     def __init__(self):
-        self.current_connection_state = None
-        self.timeout = self.DOWN_TIMEOUT
+        self.config = Config(self.CONFIG_FILE, self)
+        self.notify = Notify(self.config)
+        self.network = Network(self.config, self.notify)
 
-        self.current_latency_count = 0
+        self.current_connection_state = None
         self.current_latency_state = None
 
-        self.outages_total = 0
-        self.outage_current_time = 0
-        self.outages_total_time = 0
-
-        self.active_total_time = 0
-        self.active_current_time = 0
-
-        self.config_modified = 0
-        self.load_config()
-
-        self.create_audio_files()
-
-    def create_audio_files(self):
-        if not os.path.exists(self.ACTIVE_FILE):
-            self.create_mp3(self.ACTIVE_TEXT, self.ACTIVE_FILE)
-
-        if not os.path.exists(self.DOWN_FILE):
-            self.create_mp3(self.DOWN_TEXT, self.DOWN_FILE)
-
-        if not os.path.exists(self.SLOW_FILE):
-            self.create_mp3(self.LATENCY_HIGH_TEXT, self.SLOW_FILE)
-
-        if not os.path.exists(self.NORMAL_FILE):
-            self.create_mp3(self.LATENCY_NORMAL_TEXT, self.NORMAL_FILE)
-
-    def check_config(self):
-        last_modified = os.path.getmtime(self.CONFIG_FILE)
-        time_difference = last_modified - self.config_modified
-        if time_difference != 0:
-            print("Config file changed, reloading...")
-            self.load_config()
-
-    def load_config(self):
-        self.config_modified = os.path.getmtime(self.CONFIG_FILE)
-        try:
-            with open(self.CONFIG_FILE, "r") as f:
-                config = yaml.safe_load(f)
-
-            self.SCHEDULE_START = dttime(config["schedule"]["start_hour"], 0)
-            self.SCHEDULE_END = dttime(config["schedule"]["end_hour"], 0)
-
-            self.ACTIVE_TIMEOUT = config["timeout"]["active"]
-            self.DOWN_TIMEOUT = config["timeout"]["down"]
-            self.RESPONSE_TIMEOUT = config["timeout"]["response"]
-
-            self.ACTIVE_TEXT = config["phrase"]["active"]
-            self.DOWN_TEXT = config["phrase"]["down"]
-            self.LATENCY_HIGH_TEXT = config["phrase"]["slow"]
-            self.LATENCY_NORMAL_TEXT = config["phrase"]["normal"]
-
-            self.ACTIVE_FILE = config["audio"]["active"]
-            self.DOWN_FILE = config["audio"]["down"]
-            self.LATENCY_MIN = config["latency"]["min"]
-            self.LATENCY_COUNT = config["latency"]["count"]
-            print("Loaded config file.")
-        except Exception as e:
-            print(e)
-            print("Failed to load config, using defaults")
-
-    def is_in_schedule(self):
-        return self.SCHEDULE_START <= datetime.now().time() <= self.SCHEDULE_END
-
-    @staticmethod
-    def create_mp3(text, file):
-        print(f"Creating {file}")
-        tts = gTTS(text)
-        tts.save(file)
-
-    def play(self, file):
-        if self.is_in_schedule():
-            if platform.system() == "Windows":
-                os.system(f"start {file}")
-            elif platform.system() == "Darwin":
-                os.system(f"afplay {file}")
-            else:
-                os.system(f"mpg123 {file}")
-
-    @staticmethod
-    def is_connected(url):
-        try:
-            socket.gethostbyname(url)
-            return True
-        except socket.error as error:
-            print(error)
-            return False
-
-    def is_latency_high(self, url):
-        latency = ping3.ping(url, timeout=self.RESPONSE_TIMEOUT)
-        if not latency or latency > self.LATENCY_MIN:
-            self.current_latency_count += 1
-
-            if not latency:
-                latency = "timeout"
-            else:
-                latency = print(f"{latency*1000}ms")
-
-            if self.current_latency_count >= self.LATENCY_COUNT:
-                print(f"Latency {latency} is too high")
-                return True
-            else:
-                print(f"*** Latency: {latency}")
-                return False
-        else:
-            print(f"Latency: {latency*1000}ms")
-            self.current_latency_count = 0
-            return False
-
-    def down(self):
-        print("Internet is down")
-
-        self.outages_total += 1
-
-        self.outage_current_time = time.time()
-        self.timeout = self.DOWN_TIMEOUT
-        self.play(self.DOWN_FILE)
-
-        if self.active_current_time:
-            current_active_seconds = time.time() - self.active_current_time
-            self.active_total_time += current_active_seconds
-            print(f"Up for {current_active_seconds}s")
-            active_average = self.active_total_time / self.outages_total
-            print(f"Total uptime: {self.active_total_time}s, Average uptime: {active_average}s")
-
-    def active(self):
-        print("Internet is active")
-
-        self.active_current_time = time.time()
-        self.timeout = self.ACTIVE_TIMEOUT
-        self.play(self.ACTIVE_FILE)
-
-        if self.outage_current_time:
-            current_outage_seconds = time.time() - self.outage_current_time
-            self.outages_total_time += current_outage_seconds
-            print(f"Down for {current_outage_seconds}s")
-            outage_average = self.outages_total_time / self.outages_total
-            print(f"Total outages: {self.outages_total}, Average downtime: {outage_average}s")
-
-    def speed_slow(self):
-        print("Internet is slow")
-
-        self.play(self.SLOW_FILE)
-
-    def speed_normal(self):
-        print("Internet speed is normal")
-
-        self.play(self.NORMAL_FILE)
+        self.timeout = self.config.DOWN_TIMEOUT
 
     def detect(self, url):
-        state = self.is_connected(url)
+        state = self.network.is_connected(url)
 
         if state != self.current_connection_state:
             if state:
-                self.active()
+                self.notify.active()
+                self.timeout = self.config.ACTIVE_TIMEOUT
             else:
-                self.down()
+                self.notify.down()
+                self.timeout = self.config.DOWN_TIMEOUT
 
             self.current_connection_state = state
 
-        state = self.is_latency_high(url)
+        state = self.network.is_latency_high(url)
 
         if state != self.current_latency_state:
             if state:
-                self.speed_slow()
+                self.notify.speed_slow()
             else:
-                self.speed_normal()
+                self.notify.speed_normal()
 
             self.current_latency_state = state
 
         time.sleep(self.timeout)
-        self.check_config()
+        self.config.refresh()
 
 
 if __name__ == '__main__':
