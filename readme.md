@@ -50,3 +50,5 @@ The program will automatically detect changes to the config file and reload it w
     pip install simpleaudio
     pip install numpy
     pip install RPi.GPIO
+
+    cp down_detector.yaml.example down_detector.yaml
