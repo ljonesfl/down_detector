@@ -36,7 +36,9 @@ class DownDetector:
 
         if state != self.current_latency_state:
             if state:
-                self.notify.speed_slow()
+                # Only notify of slow connections if the connection is active
+                if self.current_connection_state:
+                    self.notify.speed_slow()
             else:
                 self.notify.speed_normal()
 
