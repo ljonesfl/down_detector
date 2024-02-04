@@ -7,7 +7,7 @@ URL = "www.google.com"
 
 
 class DownDetector:
-    CONFIG_FILE = "down_detector.yaml.example"
+    CONFIG_FILE = "down_detector.yaml"
 
     def __init__(self):
         self.config = Config(self.CONFIG_FILE, self)
