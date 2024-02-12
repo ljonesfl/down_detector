@@ -44,6 +44,11 @@ The configuration is stored in down_detector.yaml.
 The program will automatically detect changes to the config file and reload it without having to restart.
 
 ## Installation
+### Install Python Packages
+#### Batch
+    pip install -r requirements.txt
+
+#### Manual
     pip install gTTS
     pip install pyyaml
     pip install ping3
@@ -51,4 +56,5 @@ The program will automatically detect changes to the config file and reload it w
     pip install numpy
     pip install RPi.GPIO
 
+### Setup Config File
     cp down_detector.yaml.example down_detector.yaml

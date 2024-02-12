@@ -1,0 +1,6 @@
+gTTS
+pyyaml
+ping3
+simpleaudio
+numpy
+RPi.GPIO
