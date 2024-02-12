@@ -4,11 +4,11 @@ import ping3
 
 class Network:
 
-    def __init__(self, config, notify):
+    def __init__(self, config, notify, log):
         self.config = config
         self.notify = notify
+        self.log = log
         self.current_latency_count = 0
-
 
     @staticmethod
     def is_connected(url):
@@ -25,6 +25,7 @@ class Network:
             self.current_latency_count += 1
 
             self.notify.latency()
+            self.log.latency(latency)
 
             if not latency:
                 print("*** Latency: timeout")

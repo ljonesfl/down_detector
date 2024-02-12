@@ -24,6 +24,12 @@ latency:
   count: 3
   beep_on_slow: false
 
+log:
+  enabled: true
+  file: log.csv
+  active: true
+  latency: true
+
 leds:
   active_pin: 17
   latency_pin: 27

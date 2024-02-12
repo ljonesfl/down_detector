@@ -108,3 +108,4 @@ venv.bak/
 audio/*.mp3
 
 down_detector.yaml
+log.csv

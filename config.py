@@ -26,9 +26,17 @@ class Config:
 
     NOTIFY_ACTIVE_VOICE = True
     NOTIFY_ACTIVE_LED = False
+    NOTIFY_ACTIVE_LOG = False
+
     NOTIFY_LATENCY_VOICE = True
     NOTIFY_LATENCY_LED = False
     NOTIFY_LATENCY_BEEP = True
+    NOTIFY_LATENCY_LOG = True
+
+    LOG_ENABLED = True
+    LOG_FILE = "log.csv"
+    LOG_ACTIVE = True
+    LOG_LATENCY = True
 
     def __init__(self, file, detector):
         self.CONFIG_FILE = file
@@ -61,9 +69,17 @@ class Config:
 
             self.NOTIFY_ACTIVE_VOICE = config["notify"]["active"]["voice"]
             self.NOTIFY_ACTIVE_LED = config["notify"]["active"]["led"]
+            self.NOTIFY_ACTIVE_LOG = config["notify"]["active"]["log"]
+
             self.NOTIFY_LATENCY_VOICE = config["notify"]["latency"]["voice"]
             self.NOTIFY_LATENCY_LED = config["notify"]["latency"]["led"]
             self.NOTIFY_LATENCY_BEEP = config["notify"]["latency"]["beep"]
+            self.NOTIFY_LATENCY_LOG = config["notify"]["latency"]["log"]
+
+            self.LOG_ENABLED = config["log"]["enabled"]
+            self.LOG_FILE = config["log"]["file"]
+            self.LOG_ACTIVE = config["log"]["active"]
+            self.LOG_LATENCY = config["log"]["latency"]
 
             print("Loaded config file.")
 
