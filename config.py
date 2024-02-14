@@ -69,12 +69,10 @@ class Config:
 
             self.NOTIFY_ACTIVE_VOICE = config["notify"]["active"]["voice"]
             self.NOTIFY_ACTIVE_LED = config["notify"]["active"]["led"]
-            self.NOTIFY_ACTIVE_LOG = config["notify"]["active"]["log"]
 
             self.NOTIFY_LATENCY_VOICE = config["notify"]["latency"]["voice"]
             self.NOTIFY_LATENCY_LED = config["notify"]["latency"]["led"]
             self.NOTIFY_LATENCY_BEEP = config["notify"]["latency"]["beep"]
-            self.NOTIFY_LATENCY_LOG = config["notify"]["latency"]["log"]
 
             self.LOG_ENABLED = config["log"]["enabled"]
             self.LOG_FILE = config["log"]["file"]
@@ -84,7 +82,7 @@ class Config:
             print("Loaded config file.")
 
         except Exception as e:
-            print(e)
+            print( "Error loading log file. Key: " + str(e) )
             print("Failed to load config, using defaults")
 
     def refresh(self):
