@@ -1,4 +1,5 @@
 ## 0.0.4
+* Basic refactoring.
 
 ## 0.0.3
 
