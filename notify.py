@@ -1,13 +1,14 @@
+from config import Config
 from sound import Sound
 from log import Log
 import time
 
 
 class Notify:
-    def __init__(self, config):
+    def __init__( self, config: Config ):
         self.config = config
 
-        self.sound = Sound(self.config)
+        self.sound = Sound( self.config )
         self.outages_total = 0
         self.outage_current_time = 0
         self.outages_total_time = 0
@@ -17,7 +18,7 @@ class Notify:
 
         self.sound.create_audio_files()
 
-    def active(self):
+    def active( self ) -> None:
         print("Internet is active")
 
         self.active_current_time = time.time()
@@ -32,7 +33,7 @@ class Notify:
         if self.config.NOTIFY_ACTIVE_VOICE:
             self.sound.play(self.config.ACTIVE_FILE)
 
-    def down(self):
+    def down( self ) -> None:
         print("Internet is down")
 
         self.outages_total += 1
@@ -49,18 +50,18 @@ class Notify:
         if self.config.NOTIFY_ACTIVE_VOICE:
             self.sound.play(self.config.DOWN_FILE)
 
-    def speed_slow(self):
+    def speed_slow( self ) -> None:
         print("Internet is slow")
 
         if self.config.NOTIFY_LATENCY_VOICE:
             self.sound.play(self.config.SLOW_FILE)
 
-    def speed_normal(self):
+    def speed_normal( self ) -> None:
         print("Internet speed is normal")
 
         if self.config.NOTIFY_LATENCY_VOICE:
             self.sound.play(self.config.NORMAL_FILE)
 
-    def latency(self):
+    def latency( self ) -> None:
         if self.config.NOTIFY_LATENCY_BEEP:
             self.sound.blip()

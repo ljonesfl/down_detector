@@ -1,13 +1,15 @@
 import csv
 import datetime
 
+from config import Config
+
 
 class Log:
 
-    def __init__(self, config):
+    def __init__( self, config: Config ):
         self.config = config
 
-    def write(self, message, *args):
+    def write( self, message: str, *args) -> None:
         if self.config.LOG_ENABLED is False:
             return
 
@@ -19,25 +21,25 @@ class Log:
             row.extend(args)
             writer.writerow(row)
 
-    def started(self):
-        self.write('started')
+    def started( self ) -> None:
+        self.write('started', 0 )
 
-    def active(self):
+    def active( self ) -> None:
         if self.config.NOTIFY_ACTIVE_LOG:
-            self.write('internet active')
+            self.write('internet active', 0 )
 
-    def down(self):
+    def down( self ) -> None:
         if self.config.NOTIFY_ACTIVE_LOG:
-            self.write('internet down')
+            self.write('internet down', 0 )
 
-    def latency(self, latency):
+    def latency( self, latency ) -> None:
         if self.config.NOTIFY_LATENCY_LOG:
             self.write('latency warning', latency)
 
-    def speed_slow(self):
+    def speed_slow( self ) -> None:
         if self.config.NOTIFY_LATENCY_LOG:
-            self.write('speed slow')
+            self.write('speed slow', 0 )
 
-    def speed_normal(self):
+    def speed_normal( self ) -> None:
         if self.config.NOTIFY_LATENCY_LOG:
-            self.write('speed normal')
+            self.write('speed normal', 0)

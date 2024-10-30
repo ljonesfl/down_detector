@@ -2,7 +2,6 @@ import yaml
 import os
 from datetime import datetime, time as dttime
 
-
 class Config:
     SCHEDULE_START = dttime(6, 30)
     SCHEDULE_END = dttime(22, 0)
@@ -38,20 +37,19 @@ class Config:
     LOG_ACTIVE = True
     LOG_LATENCY = True
 
-    def __init__(self, file, detector):
+    def __init__( self, file ):
         self.CONFIG_FILE = file
         self.config_modified = None
-        self.detector = detector
         self.load()
 
-    def load(self):
-        self.config_modified = os.path.getmtime(self.CONFIG_FILE)
+    def load( self ) -> None:
+        self.config_modified = os.path.getmtime( self.CONFIG_FILE )
         try:
             with open(self.CONFIG_FILE, "r") as f:
                 config = yaml.safe_load(f)
 
-            self.SCHEDULE_START = dttime(config["schedule"]["start_hour"], 0)
-            self.SCHEDULE_END = dttime(config["schedule"]["end_hour"], 0)
+            self.SCHEDULE_START = dttime( config["schedule"]["start_hour"], 0 )
+            self.SCHEDULE_END = dttime( config["schedule"]["end_hour"], 0 )
 
             self.ACTIVE_TIMEOUT = config["timeout"]["active"]
             self.DOWN_TIMEOUT = config["timeout"]["down"]
@@ -82,16 +80,20 @@ class Config:
             print("Loaded config file.")
 
         except Exception as e:
-            print( "Error loading log file. Key: " + str(e) )
-            print("Failed to load config, using defaults")
+            print( "Error loading config file. Key: " + str(e) )
+            print( "Failed to load config, using defaults")
 
-    def refresh(self):
-        last_modified = os.path.getmtime(self.CONFIG_FILE)
+    def refresh( self ) -> bool:
+        last_modified = os.path.getmtime( self.CONFIG_FILE )
         time_difference = last_modified - self.config_modified
 
         if time_difference != 0:
             print("Config file changed, reloading...")
             self.load()
+            return True
 
-    def is_in_schedule(self):
-        return self.SCHEDULE_START <= datetime.now().time() <= self.SCHEDULE_END
+        return False
+
+    def is_in_schedule( self ) -> bool:
+        in_schedule = self.SCHEDULE_START <= datetime.now().time() <= self.SCHEDULE_END
+        return in_schedule
