@@ -10,11 +10,11 @@ URL = "www.google.com"
 class DownDetector:
     CONFIG_FILE = "down_detector.yaml"
 
-    def __init__(self):
-        self.config = Config(self.CONFIG_FILE, self)
-        self.notify = Notify(self.config)
-        self.log = Log(self.config)
-        self.network = Network(self.config, self.notify, self.log)
+    def __init__( self ):
+        self.config: Config = Config( self.CONFIG_FILE )
+        self.notify: Notify = Notify( self.config )
+        self.log: Log = Log( self.config )
+        self.network: Network = Network( self.config, self.notify, self.log )
 
         self.current_connection_state = None
         self.current_latency_state = None
@@ -23,8 +23,8 @@ class DownDetector:
 
         self.log.started()
 
-    def detect(self, url):
-        state = self.network.is_connected(url)
+    def detect( self, url: str ) -> None:
+        state = self.network.is_connected( url )
 
         if state != self.current_connection_state:
             if state:
@@ -38,7 +38,7 @@ class DownDetector:
 
             self.current_connection_state = state
 
-        state = self.network.is_latency_high(url)
+        state = self.network.is_latency_high( url )
 
         if state != self.current_latency_state:
             if state:
@@ -52,12 +52,15 @@ class DownDetector:
 
             self.current_latency_state = state
 
-        time.sleep(self.timeout)
+        time.sleep( self.timeout )
         self.config.refresh()
 
 
-if __name__ == '__main__':
+def main():
     dd = DownDetector()
 
     while True:
         dd.detect(URL)
+
+if __name__ == '__main__':
+    main()

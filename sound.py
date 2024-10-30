@@ -2,13 +2,15 @@ import platform
 import os
 from gtts import gTTS
 
+from config import Config
+
 
 class Sound:
 
-    def __init__(self, config):
+    def __init__(self, config: Config):
         self.config = config
 
-    def create_audio_files(self):
+    def create_audio_files(self) -> None:
         if not os.path.exists(self.config.ACTIVE_FILE):
             self.create_mp3(self.config.ACTIVE_TEXT, self.config.ACTIVE_FILE)
 
@@ -22,24 +24,24 @@ class Sound:
             self.create_mp3(self.config.LATENCY_NORMAL_TEXT, self.config.NORMAL_FILE)
 
     @staticmethod
-    def create_mp3(text, file):
+    def create_mp3( text: str, file: str ) -> None:
         print(f"Creating {file}")
         tts = gTTS(text)
         tts.save(file)
 
-    def play(self, file):
+    def play( self, file: str ) -> None:
         if not self.config.is_in_schedule():
             return
 
-        print(f"Playing {file}")
+        print( f"Playing {file}" )
         if platform.system() == "Windows":
-            os.system(f"start {file}")
+            os.system( f"start {file}" )
         elif platform.system() == "Darwin":
-            os.system(f"afplay {file}")
+            os.system( f"afplay {file}" )
         else:
-            os.system(f"mpg123 {file}")
+            os.system( f"mpg123 {file}" )
 
-    def blip(self):
+    def blip(self) -> None:
         if not self.config.is_in_schedule():
             return
 

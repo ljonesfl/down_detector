@@ -11,7 +11,7 @@ phrase:
   active: the internet connection is active
   down: the internet is currently unreachable
   normal: the internet speed is normal
-  slow: the internet is speed currently slow
+  slow: the internet speed is slow
 
 audio:
   active: audio/active.mp3
