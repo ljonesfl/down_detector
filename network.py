@@ -19,11 +19,11 @@ class Network:
         try:
             socket.gethostbyname( url )
             return True
-        except socket.error as error:
+        except Exception as error:
             print( error )
             return False
 
-    def is_latency_high( self, url: str ) -> bool:
+    def is_latency_high( self, url: str, current_state: bool ) -> bool:
         latency = ping3.ping( url, timeout=self.config.RESPONSE_TIMEOUT )
         if not latency or latency is None or latency > self.config.LATENCY_MIN:
             self.current_latency_count += 1
@@ -41,7 +41,7 @@ class Network:
             if self.current_latency_count >= self.config.LATENCY_COUNT:
                 return True
 
-            return False
+            return current_state
         else:
             print( f"Latency: {latency*1000}ms" )
             self.current_latency_count = 0

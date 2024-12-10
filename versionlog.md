@@ -1,3 +1,7 @@
+## 0.0.5 2024-12-10
+* Updated the exception handling for checking internet connectivity to be all encompassing.
+* Updated the logic to skip latency checks when no connectivity.
+
 ## 0.0.4 2024-10-30
 * Basic refactoring.
 

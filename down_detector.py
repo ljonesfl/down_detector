@@ -38,9 +38,9 @@ class DownDetector:
 
             self.current_connection_state = state
 
-        state = self.network.is_latency_high( url )
+        state = self.network.is_latency_high( url, self.current_latency_state )
 
-        if state != self.current_latency_state:
+        if self.current_connection_state and state != self.current_latency_state:
             if state:
                 # Only notify of slow connections if the connection is active
                 if self.current_connection_state:
